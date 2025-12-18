@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EQUO - INDEX</title>
+
+    <style>
+        html,
+        body {
+            height: 100vh;
+            margin: 0;
+            background: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-family: sans-serif;
+        }
+
+        #login_container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background-color: rgb(10, 10, 10);
+            width: 400px;
+            gap: 10px;
+            border-radius: 12px;
+        }
+
+        #login_container h2 {
+            color: black;
+        }
+
+        .loginBtns {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 80%;
+            height: 60px;
+            border-radius: 12px;
+            border: 0.01px rgba(255, 255, 255, 0) solid;
+        }
+
+        .loginBtns img {
+            width: 35px;
+            height: 35px;
+            margin-right: 10px;
+        }
+
+        #googleLogin {
+            background-color: white;
+        }
+
+        #githubLogin {
+            background-color: #181717;
+            color: white;
+        }
+
+        #githubLogin img {
+            filter: invert(1);
+        }
+
+        #slackLogin {
+            background: #4A154B;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="login_container">
+        <h2>WELCOME TO EQUO</h2>
+        <button id="googleLogin" class="loginBtns">
+            <img src="{{ url_for('static', filename='images/google.png')}}">
+            LOGIN WITH GOOGLE
+        </button>
+
+        <button id="githubLogin" class="loginBtns">
+            <img src="{{ url_for('static', filename='images/github.png')}}">
+            LOGIN WITH GITHUB
+        </button>
+
+        <button id="slackLogin" class="loginBtns">
+            <img src="{{ url_for('static', filename='images/slack.png')}}">
+            LOGIN WITH SLACK
+        </button>
+    </div>
+
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-analytics.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+            apiKey: "AIzaSyC5fg8uQABuPTp2bSFZiKtKKvJRo13uhwk",
+            authDomain: "equo-45977.firebaseapp.com",
+            projectId: "equo-45977",
+            storageBucket: "equo-45977.firebasestorage.app",
+            messagingSenderId: "969608561036",
+            appId: "1:969608561036:web:a362cbe158e833da2756a9",
+            measurementId: "G-ZXQ9BF9EYS"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+
+
+
+    </script>
+</body>
+
+</html>
