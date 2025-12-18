@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 import firebase_admin
 from firebase_admin import credentials, auth
+from users import registerUser
 
 
 app = Flask(__name__)
@@ -20,6 +21,14 @@ def auth_login():
         token = data.get("token")
 
         decoded = auth.verify_id_token(token)
+        uid = decoded.get('uid')
+        email = decoded.get('email')
+        picture = decoded.get('picture')
+        name = decoded.get('name')
+        provider = decoded.get('sign_in_provider')
+
+        registerUser(uid, name, email, picture, provider)
+
         return jsonify({"success": True})
 
     except Exception as e:
