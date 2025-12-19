@@ -103,6 +103,9 @@ def auth_login():
 
         registerUser(uid, name, email, picture, provider)
 
+        #SAVE SESSION
+        session['uid'] = uid
+
         return jsonify({"success": True})
 
     except Exception as e:
