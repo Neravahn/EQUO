@@ -1,6 +1,8 @@
-const eqInput = document.getElementById('equation_area');
+
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
+let compiledEquations = [];
+
 
 //RESIZE CANVAS
 function resizeCanvas() {
@@ -18,7 +20,7 @@ const STEP = 0.02;
 
 function drawAxis() {
     ctx.strokeStyle = "#000000ff";
-    ctx.linesWidth = 1;
+    ctx.lineWidth = 1;
 
 
     ctx.beginPath();
@@ -43,27 +45,28 @@ function compileEquation(expr) {
         .replace(/sqrt/g, "Math.sqrt")
         .replace(/log/g, "Math.log")
         .replace(/exp/g, "Math.exp");
-
     return new Function("x", `return ${safeExpr}`);
 }
 
-function drawGraph(f) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawAxis();
-
+function drawGraph(f, color='#000') {
     ctx.beginPath();
-    ctx.strokeStyle = "#000";
+    ctx.strokeStyle = color;
     ctx.lineWidth = 2;
 
     let firstPoint = true;
 
-    for (
-        let x = -canvas.width / 2 / SCALE;
+    for (let x = -canvas.width / 2 / SCALE;
         x <= canvas.width / 2 / SCALE;
-        x += STEP
-    ) {
-        let y = f(x);
-        if (!isFinite(y)) continue;
+        x += STEP) {
+        let y;
+
+        try {
+            y = f(x);
+            if (!isFinite(y)) continue;
+        } catch (err) {
+            console.log(err);
+        }
+        
 
         const px = canvas.width / 2 + x * SCALE;
         const py = canvas.height / 2 - y * SCALE;
@@ -80,38 +83,55 @@ function drawGraph(f) {
 }
 
 
-let debounceTimer;
+// RANDOM COLOR FOR EACH LINE
+function getRandomColor() {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
 
-eqInput.addEventListener("input", () => {
+
+let debounceTimer;
+document.addEventListener("input", (e) => {
+    if (!e.target.classList.contains("equation_area")) return;
+
     clearTimeout(debounceTimer);
 
     debounceTimer = setTimeout(() => {
-        try {
-            const expr = eqInput.value.trim();
-            if (!expr) {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                drawAxis();
-                return;
-            }
+        const allEq = document.querySelectorAll(".equation_area");
+        compiledEquations = [];
+
+        allEq.forEach((eq) => {
+            const expr = eq.value.trim();
+            if (!expr) return;
 
             const f = compileEquation(expr);
-            drawGraph(f);
+            const color = eq.dataset.color || getRandomColor();
+            eq.dataset.color = color;
 
-            eqInput.style.border = "2px solid green";
-        } catch (err) {
-            eqInput.style.border = "2px solid red";
-        }
-    }, 120);
+            compiledEquations.push({ f, eq, color});
+        });
+
+        // CLEAR CANVAS AND REDRAW
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawAxis();
+        
+
+        compiledEquations.forEach(obj => {
+            drawGraph(obj.f, obj.color);
+            obj.eq.style.border = "2px solid green";
+        });
+    }, 1000);
 });
+
 
 drawAxis();
 
 
 let audioCtx = null;
-let oscillator = null;
-let gainNode = null;
-
-
 function initAudio() {
     if (!audioCtx) {
         audioCtx = new AudioContext();
@@ -119,46 +139,51 @@ function initAudio() {
 }
 
 
+// STOP AND CLEAN ALL PREVIOUS OSCILLATORS
+let voices = [];
+function stopAllVoices() {
+    voices.forEach(v => {
+        v.oscillator.stop();
+        v.oscillator.disconnect();
+        v.gain.disconnect();
+    });
+    voices = [];
+}
 
+
+// ONE OSCILLATORS FOR ONE EQUATION
 function playEquationSound(f) {
     initAudio();
 
-    if (oscillator) {
-        oscillator.stop();
-    }
-
-    oscillator = audioCtx.createOscillator();
-    gainNode = audioCtx.createGain();
+    const oscillator = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
 
     oscillator.type = "sine";
-    gainNode.gain.value = 0.05;
+    gain.gain.value = 0.03;
 
-    oscillator.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
+    oscillator.connect(gain);
+    gain.connect(audioCtx.destination);
 
     oscillator.start();
 
-    const BASE_FREQ = 440;
-    const FREQ_SCALE = 80;
+    voices.push({ oscillator, gain });
+
+    const BASE_FREQ = 100;
+    const FREQ_SCALE = 100;
 
     let x = -5;
     const endX = 5;
     const step = 0.02;
+
     let t = audioCtx.currentTime;
 
     for (; x <= endX; x += step) {
         let y;
-        try {
-            y = f(x);
-            if (!isFinite(y)) continue;
-        } catch {
-            continue;
-        }
-
+        y = f(x);
+        if (!isFinite(y)) continue;
         y = Math.max(-5, Math.min(5, y));
 
         const freq = BASE_FREQ + y * FREQ_SCALE;
-
         oscillator.frequency.setValueAtTime(freq, t);
         t += 0.01;
     }
@@ -166,16 +191,18 @@ function playEquationSound(f) {
     oscillator.stop(t);
 }
 
-
 document.getElementById("playSound").addEventListener("click", () => {
-    try {
-        const expr = eqInput.value.trim();
+    stopAllVoices();
+    initAudio();
+
+
+    const equations = document.querySelectorAll(".equation_area");
+
+    equations.forEach(eq => {
+        const expr = eq.value.trim();
         if (!expr) return;
 
         const f = compileEquation(expr);
         playEquationSound(f);
-    } catch (err) {
-        console.error(err);
-    }
+    });
 });
-

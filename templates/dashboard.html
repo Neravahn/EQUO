@@ -75,18 +75,6 @@
         padding: 50px;
     }
 
-    #equation_area {
-        background-color: rgb(255, 255, 255);
-        height: 200px;
-        width: 80%;
-        padding: 20px;
-        color: black;
-        border: none;
-        border-radius: 12px;
-        resize: none;
-        outline: none;
-        font-size: 16px;
-    }
 
     #canvasContainer {
         border: 1px rgba(255, 0, 0, 0) solid;
@@ -100,6 +88,69 @@
         width: 100%;
         height: 100%;
         border-radius: 12px;
+    }
+
+    #playSound {
+        width: 100px;
+        height: 50px;
+        color: black;
+        background-color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        border: 1px rgba(0, 0, 0, 0) solid;
+        gap: 10px
+    }
+
+    #playSound img {
+        width: 25px;
+        height: 25px;
+    }
+
+    #equationHeader {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    #addEquation {
+        border-radius: 8px;
+        border: none;
+        font-size: 22px;
+        cursor: pointer;
+        background: transparent;
+    }
+
+    #addEquation img {
+        filter: invert(1);
+    }       
+
+    #equationList {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .equationBlock {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .equation_area {
+        background-color: white;
+        height: 75px;
+        width: 100%;
+        padding: 20px;
+        color: black;
+        border: none;
+        border-radius: 12px;
+        resize: none;
+        outline: none;
+        font-size: 16px;
     }
 </style>
 
@@ -125,10 +176,25 @@
 
     <div id="main_container">
         <div id="headerFormula_container">
-            <label for="equation_area">EQUATION 1</label>
-            <textarea id="equation_area"></textarea>
+            <div id="equationHeader">
+                <button id="addEquation">
+                    <img src="{{ url_for('static', filename='images/addEquation.png')}}">
+                </button>
+            </div>
 
-            <button id="playSound">Play</button>
+
+            <div id="equationList">
+                <div class="equationBlock">
+                    <label>EQUATION 1</label>
+                    <textarea class="equation_area"></textarea>
+                </div>
+            </div>
+
+
+            <button id="playSound">
+                PLAY
+                <img src="{{ url_for('static', filename='images/play.png')}}">
+            </button>
 
         </div>
 
@@ -137,7 +203,12 @@
         </div>
     </div>
 
+
+
+
+    <!--SCRIPTS-->
     <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/addEquation.js') }}"></script>
 
 </body>
 
