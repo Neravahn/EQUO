@@ -117,7 +117,8 @@ def dashboard():
     user = session.get('uid')
     if not user:
         return redirect('/')
-    return render_template('dashboard.html')
+    
+    return render_template('dashboard.html',)
 
 
 
