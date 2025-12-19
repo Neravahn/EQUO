@@ -37,7 +37,7 @@ def auth_login():
 
 @app.route('/dashboard')
 def dashboard():
-    return "Logged in successfully 🎉"
+    return render_template('dashboard.html')
 
 
 

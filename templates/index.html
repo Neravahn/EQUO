@@ -49,6 +49,8 @@
             border: 0.01px rgba(255, 255, 255, 0) solid;
         }
 
+
+
         .loginBtns img {
             width: 35px;
             height: 35px;
@@ -206,7 +208,7 @@
         </div>
         <button id="googleLogin" class="loginBtns">
             <img src="{{ url_for('static', filename='images/google.png')}}">
-            SIGN-IN WITH GOOGLE
+            <span>SIGN-IN WITH GOOGLE</span>
         </button>
 
         <div id="or">
@@ -215,7 +217,7 @@
 
         <button id="githubLogin" class="loginBtns">
             <img src="{{ url_for('static', filename='images/github.png')}}">
-            SIGN-IN WITH GITHUB
+            <span>SIGN-IN WITH GITHUB</span>
         </button>
 
         <p>
@@ -259,11 +261,13 @@
         const githubProvider = new GithubAuthProvider();
         githubProvider.addScope('user:email');
 
+
+
         document.getElementById("googleLogin").addEventListener("click", async () => {
             try {
-                await signInWithPopup(auth, googleProvider);
-
-
+                const result = await signInWithPopup(auth, googleProvider);
+                const token = await result.user.getIdToken();
+                await sendTokenToBackend(token);
             } catch (err) {
                 if (err.code === 'auth/account-exists-with-different-credential') {
                     const email = err.customData.email;
@@ -289,15 +293,6 @@
         document.getElementById("githubLogin").addEventListener("click", async () => {
             await signInWithRedirect(auth, githubProvider);
         });
-        let backendSent = false;
-
-        onAuthStateChanged(auth, async (user) => {
-            if (user && !backendSent) {
-                backendSent = true;
-                const token = await user.getIdToken();
-                await sendTokenToBackend(token);
-            }
-        });
 
 
         async function sendTokenToBackend(token) {
@@ -312,7 +307,7 @@
             const data = await res.json();
 
             if (data.success) {
-                window.location.href = "/dashboard";
+                window.location.replace("/dashboard");
             }
         }
 
