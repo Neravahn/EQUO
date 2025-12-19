@@ -215,6 +215,7 @@
             <span>OR</span>
         </div>
 
+        
         <button id="githubLogin" class="loginBtns">
             <img src="{{ url_for('static', filename='images/github.png')}}">
             <span>SIGN-IN WITH GITHUB</span>
@@ -280,6 +281,10 @@
         }
 
         document.getElementById('googleLogin').addEventListener('click', handleGoogleSignIn);
+
+        document.getElementById('githubLogin').addEventListener('click', () => {
+            window.location.href = '/auth/github';
+        })
 
 
 
