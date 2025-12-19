@@ -233,13 +233,9 @@
     </div>
 
     <script type="module">
-        // Import the functions you need from the SDKs you need
+        // --- Initialize Firebase APP ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-analytics.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, GithubAuthProvider, fetchSignInMethodsForEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
-        import { signInWithRedirect, getRedirectResult }
-            from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
-
+        import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC5fg8uQABuPTp2bSFZiKtKKvJRo13uhwk",
@@ -251,65 +247,40 @@
             measurementId: "G-ZXQ9BF9EYS"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-
-        //INIITIALIZE AUTH
         const auth = getAuth(app);
+
         const googleProvider = new GoogleAuthProvider();
-        const githubProvider = new GithubAuthProvider();
-        githubProvider.addScope('user:email');
 
-
-
-        document.getElementById("googleLogin").addEventListener("click", async () => {
+        async function handleGoogleSignIn() {
             try {
                 const result = await signInWithPopup(auth, googleProvider);
-                const token = await result.user.getIdToken();
-                await sendTokenToBackend(token);
-            } catch (err) {
-                if (err.code === 'auth/account-exists-with-different-credential') {
-                    const email = err.customData.email;
-                    const methods = await fetchSignInMethodsForEmail(auth, email);
-                    if (methods.includes('github.com')) {
-                        alert("You already signed up with Github. Please login with Github first to link GitHub.");
-                        const githubResult = await signInWithPopup(auth, githubProvider);
-                        const linkedUser = await githubResult.user.linkWithPopup(googleProvider);
-                        const token = await linkedUser.user.getIdToken();
-                        await sendTokenToBackend(token);
-                    } else {
-                        console.error("Existing account with unknown provider:", methods);
-                    }
+                const user = result.user;
+
+                const token = await user.getIdToken();
+
+                const res = await fetch('/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token })
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    window.location.href = '/dashboard';
                 } else {
-                    console.error(err);
+                    console.error('Backend verification failed');
                 }
-            }
-        });
 
-
-
-
-        document.getElementById("githubLogin").addEventListener("click", async () => {
-            await signInWithRedirect(auth, githubProvider);
-        });
-
-
-        async function sendTokenToBackend(token) {
-            const res = await fetch("/auth/login", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ token })
-            });
-
-            const data = await res.json();
-
-            if (data.success) {
-                window.location.replace("/dashboard");
+            } catch (error) {
+                console.error('Google login failed:', error);
+                alert('Google login failed. Please try again.');
             }
         }
+
+        document.getElementById('googleLogin').addEventListener('click', handleGoogleSignIn);
+
 
 
     </script>

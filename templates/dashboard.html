@@ -8,17 +8,63 @@
 </head>
 
 <body>
-    helllo
+    
+    <nav id="navBar">
+        <div id="navLeft">
+            EQUO
+        </div>
+
+        <div id="navCenter">
+            <button id="logout">
+                <img src="{{ url_for('static', filename='images/logout.png')}}">
+            </button>
+        </div>
+
+        <div id="navRight">
+            <img src="{{ pfp }}">
+        </div>
+    </nav>
 
 
-    <script>
+    <div id="main_container">
+        <div id="headerFormula container">
+            PLACE HOLDER
+        </div>
 
-        onAuthStateChanged(auth, async (user) => {
+        <div id="canvasContainer">
+            <canvas id="canvas"></canvas>
+        </div>
+    </div>
+
+
+
+
+
+<!--SCRIPTS-->
+    <!-- <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC5fg8uQABuPTp2bSFZiKtKKvJRo13uhwk",
+            authDomain: "equo-45977.firebaseapp.com",
+            projectId: "equo-45977",
+            storageBucket: "equo-45977.firebasestorage.app",
+            messagingSenderId: "969608561036",
+            appId: "1:969608561036:web:a362cbe158e833da2756a9",
+            measurementId: "G-ZXQ9BF9EYS"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        onAuthStateChanged(auth, (user) =>{
             if (!user) {
-                window.location.replace('/')
+                window.location.replace('/');
             }
-        });
-    </script>
+        })
+
+    </script> -->
 </body>
 
 </html>

@@ -50,4 +50,7 @@ def registerUser(uid, name, email, picture, provider):
         pass
 
 
+    conn.close()
+
+
 

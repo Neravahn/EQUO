@@ -21,6 +21,8 @@ def auth_login():
         token = data.get("token")
 
         decoded = auth.verify_id_token(token)
+        print("Decoded token:", decoded)
+
         uid = decoded.get('uid')
         email = decoded.get('email')
         picture = decoded.get('picture')
