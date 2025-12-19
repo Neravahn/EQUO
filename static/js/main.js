@@ -104,8 +104,78 @@ eqInput.addEventListener("input", () => {
     }, 120);
 });
 
-
-
-
-
 drawAxis();
+
+
+let audioCtx = null;
+let oscillator = null;
+let gainNode = null;
+
+
+function initAudio() {
+    if (!audioCtx) {
+        audioCtx = new AudioContext();
+    }
+}
+
+
+
+function playEquationSound(f) {
+    initAudio();
+
+    if (oscillator) {
+        oscillator.stop();
+    }
+
+    oscillator = audioCtx.createOscillator();
+    gainNode = audioCtx.createGain();
+
+    oscillator.type = "sine";
+    gainNode.gain.value = 0.05;
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+
+    oscillator.start();
+
+    const BASE_FREQ = 440;
+    const FREQ_SCALE = 80;
+
+    let x = -5;
+    const endX = 5;
+    const step = 0.02;
+    let t = audioCtx.currentTime;
+
+    for (; x <= endX; x += step) {
+        let y;
+        try {
+            y = f(x);
+            if (!isFinite(y)) continue;
+        } catch {
+            continue;
+        }
+
+        y = Math.max(-5, Math.min(5, y));
+
+        const freq = BASE_FREQ + y * FREQ_SCALE;
+
+        oscillator.frequency.setValueAtTime(freq, t);
+        t += 0.01;
+    }
+
+    oscillator.stop(t);
+}
+
+
+document.getElementById("playSound").addEventListener("click", () => {
+    try {
+        const expr = eqInput.value.trim();
+        if (!expr) return;
+
+        const f = compileEquation(expr);
+        playEquationSound(f);
+    } catch (err) {
+        console.error(err);
+    }
+});
+
