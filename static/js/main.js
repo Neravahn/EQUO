@@ -1,13 +1,13 @@
 
-const canvas = document.getElementById('canvas');
+const canvas = document.getElementById('.oscCanvas');
 const ctx = canvas.getContext('2d');
 let compiledEquations = [];
 
 
 //RESIZE CANVAS
 function resizeCanvas() {
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
 }
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
@@ -67,9 +67,13 @@ function drawGraph(f, color = '#000') {
             console.log(err);
         }
 
+        const MAX_Y = canvas.height / 2 / SCALE;
+        y = Math.max(-MAX_Y, Math.min(MAX_Y, y));
+
 
         const px = canvas.width / 2 + x * SCALE;
         const py = canvas.height / 2 - y * SCALE;
+
 
         if (firstPoint) {
             ctx.moveTo(px, py);
@@ -147,7 +151,7 @@ document.addEventListener("input", (e) => {
             );
             obj.textarea.style.border = "2px solid green";
         });
-    }, 10);
+    }, 100);
 });
 
 

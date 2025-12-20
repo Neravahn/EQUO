@@ -3,22 +3,31 @@ let equationCount = 1
 document.getElementById('addEquation').addEventListener('click', () => {
     equationCount++;
 
+
     const block = document.createElement('div');
     block.className = 'equationBlock';
 
 
     block.innerHTML = `
         <label>EQUATION ${equationCount}</label>
-        <textarea class="equation_area"></textarea>
-        <div>
-            <span>freq (f) : <span class="fval">100</span></span>
-            <input type="range" class="controls fSlider" min="50" max="1000" value="100">
-        </div>
+        <div class="eqRow">
 
-        <div>
-            <span>amp (a) : <span class="aval">50</span></span>
-            <input type="range" class="controls aSlider" min="0" max="200" value="50"></span>
-        </div>
+                        <div class="eqControls">
+                            <textarea class="equation_area"></textarea>
+
+                            <div>
+                                <span>freq (f): <span class="fval">100</span></span>
+                                <input type="range" class="controls fSlider" min="50" max="1000" value="100">
+                            </div>
+
+                            <div>
+                                <span>amp (a): <span class="aval">50</span></span>
+                                <input type="range" class="controls aSlider" min="0" max="200" value="50">
+                            </div>
+                        </div>
+
+                        <canvas class="oscCanvas"></canvas>
+                    </div>
     `;
 
     equationList.appendChild(block);
