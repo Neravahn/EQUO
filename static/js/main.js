@@ -45,10 +45,10 @@ function compileEquation(expr) {
         .replace(/sqrt/g, "Math.sqrt")
         .replace(/log/g, "Math.log")
         .replace(/exp/g, "Math.exp");
-    return new Function("x", `return ${safeExpr}`);
+    return new Function("x", "f", "a", `return ${safeExpr}`);
 }
 
-function drawGraph(f, color='#000') {
+function drawGraph(f, color = '#000') {
     ctx.beginPath();
     ctx.strokeStyle = color;
     ctx.lineWidth = 2;
@@ -61,12 +61,12 @@ function drawGraph(f, color='#000') {
         let y;
 
         try {
-            y = f(x);
+            y = f(x, 200, 50);
             if (!isFinite(y)) continue;
         } catch (err) {
             console.log(err);
         }
-        
+
 
         const px = canvas.width / 2 + x * SCALE;
         const py = canvas.height / 2 - y * SCALE;
@@ -112,13 +112,13 @@ document.addEventListener("input", (e) => {
             const color = eq.dataset.color || getRandomColor();
             eq.dataset.color = color;
 
-            compiledEquations.push({ f, eq, color});
+            compiledEquations.push({ f, eq, color });
         });
 
         // CLEAR CANVAS AND REDRAW
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawAxis();
-        
+
 
         compiledEquations.forEach(obj => {
             drawGraph(obj.f, obj.color);
@@ -179,7 +179,7 @@ function playEquationSound(f) {
 
     for (; x <= endX; x += step) {
         let y;
-        y = f(x);
+        y = f(x, 200, 50);
         if (!isFinite(y)) continue;
         y = Math.max(-5, Math.min(5, y));
 
@@ -194,7 +194,6 @@ function playEquationSound(f) {
 document.getElementById("playSound").addEventListener("click", () => {
     stopAllVoices();
     initAudio();
-
 
     const equations = document.querySelectorAll(".equation_area");
 
