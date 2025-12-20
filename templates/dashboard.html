@@ -156,6 +156,10 @@
         outline: none;
         font-size: 16px;
     }
+
+    .controls {
+        width: 200px;
+    }
 </style>
 
 
@@ -191,6 +195,16 @@
                 <div class="equationBlock">
                     <label>EQUATION 1</label>
                     <textarea class="equation_area"></textarea>
+
+                    <div>
+                        <span>freq (f) : <span class="fval">100</span></span>
+                        <input type="range" class="controls fSlider" min="50" max="1000" value="100">
+                    </div>
+
+                    <div>
+                        <span>amp (a) : <span class="aval">50</span> </span>
+                        <input type="range" class="controls aSlider" min="0" max="200" value="50"></span>
+                    </div>
                 </div>
             </div>
 

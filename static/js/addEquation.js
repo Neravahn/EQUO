@@ -10,7 +10,33 @@ document.getElementById('addEquation').addEventListener('click', () => {
     block.innerHTML = `
         <label>EQUATION ${equationCount}</label>
         <textarea class="equation_area"></textarea>
+        <div>
+            <span>freq (f) : <span class="fval">100</span></span>
+            <input type="range" class="controls fSlider" min="50" max="1000" value="100">
+        </div>
+
+        <div>
+            <span>amp (a) : <span class="aval">50</span></span>
+            <input type="range" class="controls aSlider" min="0" max="200" value="50"></span>
+        </div>
     `;
 
     equationList.appendChild(block);
 })
+
+
+
+document.addEventListener("input", (e) => {
+    const block = e.target.closest(".equationBlock");
+    if (!block) return;
+
+    // FREQUENCY SLIDER
+    if (e.target.classList.contains("fSlider")) {
+        block.querySelector(".fval").textContent = e.target.value;
+    }
+
+    // AMPLITUDE SLIDER
+    if (e.target.classList.contains("aSlider")) {
+        block.querySelector(".aval").textContent = e.target.value;
+    }
+});

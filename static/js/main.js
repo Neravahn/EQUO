@@ -61,7 +61,7 @@ function drawGraph(f, color = '#000') {
         let y;
 
         try {
-            y = f(x, 200, 50);
+            y = f(x);
             if (!isFinite(y)) continue;
         } catch (err) {
             console.log(err);
@@ -96,23 +96,43 @@ function getRandomColor() {
 
 let debounceTimer;
 document.addEventListener("input", (e) => {
-    if (!e.target.classList.contains("equation_area")) return;
+    if (
+        !e.target.classList.contains("equation_area") &&
+        !e.target.classList.contains("fSlider") &&
+        !e.target.classList.contains("aSlider")
+    ) return;
+
 
     clearTimeout(debounceTimer);
 
     debounceTimer = setTimeout(() => {
-        const allEq = document.querySelectorAll(".equation_area");
+
+        const blocks = document.querySelectorAll(".equationBlock")
         compiledEquations = [];
 
-        allEq.forEach((eq) => {
-            const expr = eq.value.trim();
+        blocks.forEach(block => {
+            const textarea = block.querySelector(".equation_area");
+            const expr = textarea.value.trim();
+            const fSlider = block.querySelector(".fSlider");
+            const aSlider = block.querySelector(".aSlider")
             if (!expr) return;
 
-            const f = compileEquation(expr);
-            const color = eq.dataset.color || getRandomColor();
-            eq.dataset.color = color;
+            const fval = Number(fSlider.value);
+            const aval = Number(aSlider.value);
 
-            compiledEquations.push({ f, eq, color });
+
+            const fn = compileEquation(expr)
+
+            const color = textarea.dataset.color || getRandomColor();
+            textarea.dataset.color = color;
+
+            compiledEquations.push({
+                fn,
+                fval,
+                aval,
+                color,
+                textarea
+            });
         });
 
         // CLEAR CANVAS AND REDRAW
@@ -121,10 +141,13 @@ document.addEventListener("input", (e) => {
 
 
         compiledEquations.forEach(obj => {
-            drawGraph(obj.f, obj.color);
-            obj.eq.style.border = "2px solid green";
+            drawGraph(
+                (x) => obj.fn(x, obj.fval, obj.aval),
+                obj.color
+            );
+            obj.textarea.style.border = "2px solid green";
         });
-    }, 1000);
+    }, 10);
 });
 
 
@@ -152,7 +175,7 @@ function stopAllVoices() {
 
 
 // ONE OSCILLATORS FOR ONE EQUATION
-function playEquationSound(f) {
+function playEquationSound(obj) {
     initAudio();
 
     const oscillator = audioCtx.createOscillator();
@@ -168,8 +191,7 @@ function playEquationSound(f) {
 
     voices.push({ oscillator, gain });
 
-    const BASE_FREQ = 100;
-    const FREQ_SCALE = 100;
+
 
     let x = -5;
     const endX = 5;
@@ -179,11 +201,11 @@ function playEquationSound(f) {
 
     for (; x <= endX; x += step) {
         let y;
-        y = f(x, 200, 50);
+        y = obj.fn(x, obj.fval, obj.aval);
         if (!isFinite(y)) continue;
         y = Math.max(-5, Math.min(5, y));
 
-        const freq = BASE_FREQ + y * FREQ_SCALE;
+        const freq = obj.fval + y * 50;
         oscillator.frequency.setValueAtTime(freq, t);
         t += 0.01;
     }
@@ -195,13 +217,7 @@ document.getElementById("playSound").addEventListener("click", () => {
     stopAllVoices();
     initAudio();
 
-    const equations = document.querySelectorAll(".equation_area");
-
-    equations.forEach(eq => {
-        const expr = eq.value.trim();
-        if (!expr) return;
-
-        const f = compileEquation(expr);
-        playEquationSound(f);
+    compiledEquations.forEach(obj => {
+        playEquationSound(obj);
     });
 });
